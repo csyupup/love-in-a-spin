@@ -7,7 +7,7 @@ import { Store } from './store.mjs';
 import { DomainError } from './domain.mjs';
 
 const root = fileURLToPath(new URL('../public/',import.meta.url));
-const assets = new Map([['/',['index.html','text/html; charset=utf-8']],['/index.html',['index.html','text/html; charset=utf-8']],['/style.css',['style.css','text/css; charset=utf-8']],['/app.js',['app.js','text/javascript; charset=utf-8']],['/wheel.js',['wheel.js','text/javascript; charset=utf-8']],['/sync.js',['sync.js','text/javascript; charset=utf-8']],['/favicon.svg',['favicon.svg','image/svg+xml']]]);
+const assets = new Map([['/',['index.html','text/html; charset=utf-8']],['/index.html',['index.html','text/html; charset=utf-8']],['/style.css',['style.css','text/css; charset=utf-8']],['/app.js',['app.js','text/javascript; charset=utf-8']],['/wheel.js',['wheel.js','text/javascript; charset=utf-8']],['/sync.js',['sync.js','text/javascript; charset=utf-8']],['/scroll-lock.js',['scroll-lock.js','text/javascript; charset=utf-8']],['/prize-icons.js',['prize-icons.js','text/javascript; charset=utf-8']],['/icons/mcdonalds.svg',['icons/mcdonalds.svg','image/svg+xml']],['/favicon.svg',['favicon.svg','image/svg+xml']]]);
 async function readJson(req) {
   if (!(req.headers['content-type'] || '').startsWith('application/json')) throw new DomainError('请发送 JSON 内容',415);
   const chunks=[]; let size = 0;

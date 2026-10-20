@@ -1,67 +1,72 @@
 # Love in a Spin ♡
 
-一个只属于两个人的惊喜小铺。收藏喜欢、奖励和小礼品，勾选后等概率放进转盘，让普通的日子多一点期待。
+我们的惊喜小铺：收藏喜欢、奖励和小礼品，勾选后等概率放进转盘，让普通的日子多一点期待。
+
+这是可部署到 GitHub Pages 的纯静态网站，无第三方运行依赖，也不需要线上后端或数据库。
 
 ## 本地运行
 
-需要 **Node.js 22.13 或以上**，无第三方运行依赖。
+需要 Node.js 22.13 或以上；页面使用支持 Web Locks 的新版 Safari、Chrome、Edge 或 Firefox：
 
 ```sh
 npm start
 ```
 
-打开 http://localhost:4173 。首次访问自动生成一份包含示例心愿的独立清单，专属链接保存在地址栏和此浏览器中。不要丢失这个链接；目前没有账号找回功能。
+打开 http://localhost:4173 。首次访问会载入当前预设的 28 份心愿，所有心愿均未勾选，抽奖记录为空。
 
 ```sh
-npm test       # 领域逻辑、SQLite 持久化、HTTP 集成测试
+npm test       # 抽奖、浏览器存储、兼容保留的服务端逻辑等测试
 npm run check # JavaScript 语法检查
-npm run dev   # 服务端文件修改后自动重启
+npm run build # 将纯静态发布文件生成到 dist/
 ```
 
-## 已实现
+预览 GitHub Pages 项目子路径：
 
-- 奶油手账风，手机和电脑自适应；中文界面、键盘可用的分类标签和表单弹窗。
-- 新增、编辑、删除心愿，分类、搜索、图标、备注；最多收藏 32 项。
-- 勾选即时更新等分转盘，筛选页全选、取消勾选。
-- 服务端 `crypto.randomInt(N)` 均匀抽取，**每项概率严格为 1/N**；转盘动画仅展示结果。概率文字按两位小数展示，可能存在显示舍入。
-- 转动期间锁定本页操作；空清单禁用抽取；只选一项时概率为 100%。
-- 独立抽取，可重复抽中。抽取编号支持短期请求去重；最近 100 条结果保留当时的奖品快照，改名或删除奖品不会改变历史。
-- 幸福记录、兑现标记、可关闭的合成音效、彩纸和减少动态效果偏好。
-- 共享链接打开同一份服务器清单，每 4 秒获取其他设备的更新。并发修改有版本冲突保护。
+```sh
+node scripts/serve-static.mjs --dir dist --port 4174 --base /love-in-a-spin/
+```
 
-## 共享与部署
+## 功能与保存方式
 
-**当前交付是本机预览，尚未部署到互联网。** `localhost` 链接只能在运行服务的电脑打开。手机远程访问需要部署 Node 服务，并使用同一个包含 `#r=...` 的完整链接。
+- 奶油手账风，适配手机和电脑；中文界面与键盘可用的分类、表单。
+- 新增、编辑、删除心愿，支持搜索、图标与备注，最多收藏 32 项。
+- 分类为「吃喝玩乐 / 约会时光 / 专属宠爱」，包含麦当劳等 55 个可选小图标。
+- 勾选即时更新等分转盘；固定指针，结果直接显示在转盘下方。
+- 浏览器使用 `crypto.getRandomValues()` 加拒绝采样，保证每项概率为 1/N；每次独立，可重复抽中。概率文字按两位小数展示。
+- 最近 100 条幸福记录与兑现标记；保存抽中时的心愿快照，修改或删除心愿不会改写历史。
+- 可开关音效，支持系统的减少动态效果偏好。弹窗仅内部滚动，关闭后恢复首页位置。
 
-此项目有真正的共享存储，**不能只上传到 GitHub Pages**。仓库保存源代码，运行中的服务将清单存入 SQLite，默认位置为 `data/love.db`。适合部署到支持 Node.js 和持久化磁盘的服务器，或使用 Docker。数据库及个人运行数据不会提交到 GitHub。
+清单、勾选与抽奖记录保存在**当前浏览器的 localStorage**。刷新、关页再打开仍可保留；同一浏览器同一站点的多个标签页会同步。不同设备或浏览器分别保存，无法互相同步。清除网站数据或使用无痕模式，可能丢失本机修改和记录。
 
-环境变量：
+预设心愿在 `public/initial-wishes.json`，仅首次访问时载入；更新网站不会覆盖已有的本机清单。发布文件不包含本地 SQLite 数据库、旧共享链接或运行记录。
 
-| 变量 | 默认值 | 用途 |
-| --- | --- | --- |
-| `HOST` | `127.0.0.1` | 外部服务通常设置为 `0.0.0.0` |
-| `PORT` | `4173` | HTTP 端口 |
-| `DATA_PATH` | `data/love.db` | SQLite 文件位置；必须使用可持久化目录 |
+## GitHub Pages 发布
 
-Docker 启动方式（需要本机安装 Docker）：
+仓库的 `.github/workflows/pages.yml` 在推送 `main` 时自动检查、测试、构建并部署 `dist/`。在 GitHub 仓库 **Settings → Pages → Source** 选择 **GitHub Actions**。
+
+目标地址：[我们的惊喜小铺](https://csyupup.github.io/love-in-a-spin/)。该地址是否可访问以实际部署状态为准。
+
+GitHub 账户套餐必须支持此仓库的 Pages；不支持私有仓库 Pages 的套餐需要将仓库设为公开或升级。公开仓库会公开源码及预设心愿；访问者在自己浏览器中的后续编辑和抽奖记录不会上传到 GitHub。
+
+也可用 Docker 运行静态预览：
 
 ```sh
 docker compose up --build -d
 ```
 
-访问 http://localhost:3000 。Compose 将数据保存在 `love-data` 卷中。正式部署应在反向代理上启用 HTTPS 和限流，保留请求的原始 Host 头。备份时停止服务并备份整个数据目录；不要使用 `docker compose down -v`，它会删除数据卷。当前未进行 Docker 环境实测。
-
-共享链接是清单的访问凭证，任何持有链接的人都能查看和编辑，仅分享给另一半。Token 使用 256 位随机数，位于 URL fragment；服务器仅存储其 SHA-256 摘要。静态资源禁止内嵌第三方脚本，无外部字体、追踪或图片请求。当前不提供成员账号、Token 撤销或登录找回。
+访问 http://localhost:3000 。当前未进行 Docker 环境实测。
 
 ## 文件结构
 
 ```text
-public/           原生 HTML、CSS、浏览器交互和 SVG 转盘
-src/domain.mjs    输入校验、等概率抽取
-src/store.mjs     SQLite 清单、版本和历史记录
-src/server.mjs    同源 HTTP API、静态资源
-tests/            node:test 单元与集成测试
-docs/             设计、实现计划和实测记录
+public/                    HTML、CSS、浏览器交互、SVG 与初始心愿
+public/browser-store.js    浏览器持久化、等概率抽奖、记录与版本保护
+scripts/build-pages.mjs    生成 GitHub Pages 静态发布目录
+scripts/serve-static.mjs   本地纯静态预览
+.github/workflows/         自动检查及 Pages 部署
+src/                       保留的旧版本地 Node/SQLite 服务，不参与 Pages 部署
+tests/                     node:test 单元与集成测试
+docs/                      设计、实现计划和实测记录
 ```
 
 ## 参考学习
@@ -69,4 +74,4 @@ docs/             设计、实现计划和实测记录
 - [CrazyTim/spin-wheel](https://github.com/CrazyTim/spin-wheel)：参考先决定中奖项，再缓动旋转到该项的设计。
 - [buuing/lucky-canvas](https://github.com/buuing/lucky-canvas)：参考可配置奖品、图片和文字的抽奖交互。
 
-当前转盘和界面独立实现，未复制以上项目源码，无第三方运行依赖。
+当前转盘和界面独立实现，未复制以上项目源码。

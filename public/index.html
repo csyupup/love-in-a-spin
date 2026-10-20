@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fbf7ef">
   <meta name="description" content="收藏你的喜欢，把今天的小幸福交给转盘。一个属于两个人的惊喜小铺。">
-  <title>Love in a Spin · 我们的惊喜小铺</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/style.css">
-  <script type="module" src="/app.js"></script>
+  <title>我们的惊喜小铺</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
 </head>
 <body>
   <svg class="icon-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-    <symbol id="i-link" viewBox="0 0 24 24"><path d="m10 13 4-4m-6 6-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 2 1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 1)"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5ZM20 2v4m-2-2h4"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="m16 3 5 5-12 12-6 1 1-6L16 3ZM13 6l5 5"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></symbol>
@@ -26,8 +25,8 @@
   </defs></svg>
   <div class="site-shell">
     <header class="site-header">
-      <a class="brand" href="/" aria-label="Love in a Spin 首页"><span class="brand-mark"><svg class="icon"><use href="#i-heart"/></svg><i>✦</i></span><span>Love in a <em>Spin</em><small>只属于我们的惊喜小铺</small></span></a>
-      <div class="header-right"><span class="for-two">MADE FOR TWO <span>♡</span></span><button class="button button-outline share-button" id="share-button"><svg class="icon"><use href="#i-link"/></svg><span>分享给另一半</span></button></div>
+      <a class="brand" href="./" aria-label="Love in a Spin 首页"><span class="brand-mark"><svg class="icon"><use href="#i-heart"/></svg><i>✦</i></span><span>Love in a <em>Spin</em><small>只属于我们的惊喜小铺</small></span></a>
+      <div class="header-right"><span class="for-two">MADE FOR TWO <span>♡</span></span></div>
     </header>
 
     <main>
@@ -45,35 +44,49 @@
             <div class="wheel-frame"><div class="wheel-pointer" aria-hidden="true"><svg viewBox="0 0 40 48"><path d="M5 8Q20-1 35 8L23 41Q20 48 17 41Z" fill="#b9576d" stroke="#fff9ee" stroke-width="3"/><circle cx="20" cy="12" r="4" fill="#fbe8d5"/></svg></div><div class="wheel-rim"><svg id="wheel" viewBox="0 0 440 440" role="img" aria-label="惊喜转盘"></svg></div><button class="wheel-center" id="center-spin" aria-label="开始转盘" disabled><svg class="icon"><use href="#i-heart"/></svg><span>FOR YOU</span></button></div>
             <span class="wheel-shadow" aria-hidden="true"></span>
           </div>
-          <button class="button button-primary spin-button" id="spin-button" disabled><svg class="icon"><use href="#i-spark"/></svg><span>转出小惊喜</span><span aria-hidden="true">↗</span></button>
+          <button class="button button-primary spin-button" id="spin-button" disabled><svg class="icon"><use href="#i-spark"/></svg><span>转出小惊喜</span></button>
           <p class="fairness-note"><svg class="icon"><use href="#i-check"/></svg><span id="fairness-text">每份喜欢，都值得同样的幸运</span></p>
+          <div class="draw-result" id="draw-result" role="status" aria-live="polite" hidden><span class="draw-result-emoji" id="draw-result-emoji" aria-hidden="true"></span><div><small>这次的小幸运是</small><strong id="draw-result-title"></strong><p id="draw-result-note"></p></div><span class="draw-result-heart" aria-hidden="true">♡</span></div>
           <div class="wheel-footnote"><span>一转一份心意</span><span aria-hidden="true">✧</span><span>每次都是新的期待</span></div>
         </section>
 
         <section class="collection-panel" aria-labelledby="collection-title">
-          <div class="panel-topline"><span class="section-kicker">02 / 收藏小美好</span><span class="save-state" id="save-state" role="status"><i></i>正在连接</span></div>
-          <div class="collection-heading"><div><h2 id="collection-title">我们的小心愿<span id="total-count">0</span></h2><p>勾选喜欢的，把它放进转盘里。</p></div><button class="add-round" id="add-button" aria-label="添加小心愿" disabled><svg class="icon"><use href="#i-plus"/></svg></button></div>
-          <div class="category-tabs" role="tablist" aria-label="心愿分类"><button role="tab" aria-selected="true" aria-controls="item-list" id="tab-all" data-category="all">全部心愿</button><button role="tab" aria-selected="false" aria-controls="item-list" id="tab-likes" data-category="likes" tabindex="-1">她的喜好</button><button role="tab" aria-selected="false" aria-controls="item-list" id="tab-rewards" data-category="rewards" tabindex="-1">甜蜜奖励</button><button role="tab" aria-selected="false" aria-controls="item-list" id="tab-gifts" data-category="gifts" tabindex="-1">小礼品</button></div>
+          <div class="panel-topline"><span class="section-kicker">02 / 收藏小美好</span><span class="save-state" id="save-state" role="status"><i></i>正在加载</span></div>
+          <div class="collection-heading"><div><h2 id="collection-title">小心愿<span id="total-count">0</span></h2><p>勾选喜欢的，把它放进转盘里。</p></div><button class="add-round" id="add-button" aria-label="添加小心愿" disabled><svg class="icon"><use href="#i-plus"/></svg></button></div>
+          <div class="category-tabs" role="tablist" aria-label="心愿分类"><button role="tab" aria-selected="true" aria-controls="item-list" id="tab-food" data-category="food">吃喝玩乐</button><button role="tab" aria-selected="false" aria-controls="item-list" id="tab-dates" data-category="dates" tabindex="-1">约会时光</button><button role="tab" aria-selected="false" aria-controls="item-list" id="tab-care" data-category="care" tabindex="-1">专属宠爱</button></div>
           <div class="list-toolbar"><label class="search-field"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="找找你的小心愿" aria-label="搜索心愿" maxlength="50"></label><button class="text-button" id="select-all" disabled>全选</button></div>
-          <div id="item-list" class="item-list" role="tabpanel" aria-labelledby="tab-all"><div class="loading-state"><span>♡</span>正在整理小心愿…</div></div>
+          <div id="item-list" class="item-list" role="tabpanel" aria-labelledby="tab-food"><div class="loading-state"><span>♡</span>正在整理小心愿…</div></div>
           <div class="collection-footer"><span><strong id="selected-count">0</strong> 份惊喜已就位</span><button class="text-button" id="clear-selection" disabled>清空勾选</button></div>
-          <p class="collection-tip"><svg class="icon"><use href="#i-heart"/></svg>清单可以一起编辑，喜欢也可以慢慢收集。</p>
+          <p class="collection-tip"><svg class="icon"><use href="#i-heart"/></svg>清单与记录保存在本机，喜欢可以慢慢收集。</p>
         </section>
       </div>
 
       <section class="history-section" aria-labelledby="history-title"><div class="history-heading"><div><span class="section-kicker">OUR LITTLE MEMORIES</span><h2 id="history-title">幸福，有迹可循<span class="tiny-star" aria-hidden="true">✧</span></h2></div><button class="text-button" id="history-more" hidden>查看全部 <span aria-hidden="true">↗</span></button></div><div id="history-list" class="history-list"><div class="history-empty"><span aria-hidden="true">✉</span><p>第一份小幸运，还在等你开启。<small>每一次心动，都会好好记在这里。</small></p><span class="empty-dashes" aria-hidden="true">♡ · · · · · · · · · · · ♡</span></div></div></section>
-      <div class="connection-banner" id="connection-banner" hidden role="alert"><span id="connection-message"></span><button class="text-button" id="retry-button">重新连接</button></div>
+      <div class="connection-banner" id="connection-banner" hidden role="alert"><span id="connection-message"></span><button class="text-button" id="retry-button">重新加载</button></div>
     </main>
     <footer class="site-footer"><span>Love in a Spin <span aria-hidden="true">♡</span></span><p>把平凡的日子，过成值得期待的样子。</p><span>JUST YOU & ME</span></footer>
   </div>
 
-  <dialog id="item-dialog" class="modal item-modal" aria-labelledby="item-dialog-title"><form id="item-form"><div class="modal-top"><span class="eyebrow">COLLECT A LITTLE HAPPINESS</span><button type="button" class="icon-button close-dialog" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="item-dialog-title">再收藏一份小美好</h2><p class="modal-description">认真记下的喜欢，都会变成惊喜。</p><label class="form-label">小惊喜的名字<input name="title" id="item-title" placeholder="比如：周末一起去看海" required maxlength="48" autocomplete="off"></label><fieldset class="category-options"><legend>放在哪个小口袋？</legend><label><input type="radio" name="category" value="likes" checked><span>🧋 她的喜好</span></label><label><input type="radio" name="category" value="rewards"><span>💌 甜蜜奖励</span></label><label><input type="radio" name="category" value="gifts"><span>🎁 小礼品</span></label></fieldset><fieldset class="emoji-options"><legend>挑一个小图标</legend><div id="emoji-options"></div></fieldset><label class="form-label">给它留句话 <small>选填，最多 80 字</small><textarea name="note" id="item-note" rows="2" placeholder="把只有你们懂的小细节写在这里…" maxlength="160"></textarea></label><label class="include-option"><input type="checkbox" name="selected" checked>同时放进这次的转盘</label><p class="form-error" id="item-error" role="alert"></p><button class="button button-primary modal-submit" id="save-item" type="submit">收好这份小美好 <span aria-hidden="true">♡</span></button></form></dialog>
+  <dialog id="item-dialog" class="modal item-modal" aria-labelledby="item-dialog-title">
+    <form id="item-form">
+      <header class="modal-header">
+        <div class="modal-top"><span class="eyebrow">COLLECT A LITTLE HAPPINESS</span><button type="button" class="icon-button close-dialog" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div>
+        <h2 id="item-dialog-title">再收藏一份小美好</h2>
+        <p class="modal-description">认真记下的喜欢，都会变成惊喜。</p>
+      </header>
+      <div class="modal-scroll">
+        <label class="form-label">小惊喜的名字<input name="title" id="item-title" placeholder="比如：周末一起去看海" required maxlength="48" autocomplete="off"></label><fieldset class="category-options"><legend>放在哪个小口袋？</legend><label><input type="radio" name="category" value="food" checked><span>🧋 吃喝玩乐</span></label><label><input type="radio" name="category" value="dates"><span>🎬 约会时光</span></label><label><input type="radio" name="category" value="care"><span>💌 专属宠爱</span></label></fieldset><fieldset class="emoji-options"><legend>挑一个小图标</legend><div id="emoji-options"></div></fieldset><label class="form-label">给它留句话 <small>选填，最多 80 字</small><textarea name="note" id="item-note" rows="2" placeholder="把只有你们懂的小细节写在这里…" maxlength="160"></textarea></label><label class="include-option"><input type="checkbox" name="selected" checked>同时放进这次的转盘</label>
+      </div>
+      <footer class="modal-footer">
+        <p class="form-error" id="item-error" role="alert"></p>
+        <button class="button button-primary modal-submit" id="save-item" type="submit">收好这份小美好 <span aria-hidden="true">♡</span></button>
+      </footer>
+    </form>
+  </dialog>
 
-  <dialog id="result-dialog" class="modal result-modal" aria-labelledby="result-title"><button class="icon-button close-dialog result-close" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button><div class="result-sticker" id="result-emoji" aria-hidden="true">🎁</div><span class="eyebrow">A LITTLE LUCK, A LOT OF LOVE</span><p class="result-pretitle">叮！今天的小幸运是</p><h2 id="result-title"></h2><p id="result-note"></p><div class="result-ticket"><span>专属宠爱兑换券</span><svg class="icon"><use href="#i-heart"/></svg><small>仅限心爱的你 · 永不过期</small></div><button class="button button-primary modal-submit" id="result-done">把这份幸福收好 <span aria-hidden="true">♡</span></button><p class="result-hint">已记在「幸福记录」里，随时可以兑现哦。</p></dialog>
 
   <dialog id="delete-dialog" class="modal confirm-modal" aria-labelledby="delete-title"><span class="confirm-emoji" aria-hidden="true">💌</span><h2 id="delete-title">把这份心愿移出清单？</h2><p id="delete-description"></p><p class="modal-description">已经抽中的幸福记录会为你保留。</p><div class="confirm-actions"><button class="button button-outline close-dialog">再想想</button><button class="button button-primary" id="confirm-delete">确定移除</button></div></dialog>
 
-  <dialog id="share-dialog" class="modal share-modal" aria-labelledby="share-title"><div class="modal-top"><span class="eyebrow">OUR SECRET LITTLE PLACE</span><button class="icon-button close-dialog" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="share-title">把小铺分享给另一半</h2><p class="modal-description">用同一个链接打开，就能一起收藏喜欢、转出惊喜。拿到链接的人都可以编辑，请只分享给 TA。</p><label class="form-label">专属清单链接<input id="share-url" readonly aria-label="专属清单链接"></label><p id="local-share-hint" class="share-hint"></p><button class="button button-primary modal-submit" id="copy-link">复制专属链接 <svg class="icon"><use href="#i-link"/></svg></button></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div><div class="confetti" id="confetti" aria-hidden="true"></div>
 </body>
 </html>

@@ -1,3 +1,5 @@
+import { prizeIconAsset } from './prize-icons.js';
+
 export function spinTarget(current, index, count) {
   const desired = ((-index * 360 / count) % 360 + 360) % 360;
   const normalized = ((current % 360) + 360) % 360;
@@ -31,7 +33,11 @@ export function renderWheel(svg, items) {
     const limit = count>16 ? 3 : count>10 ? 4 : 7;
     const label = [...item.title].length>limit ? [...item.title].slice(0,limit).join('')+'…' : item.title;
     const title=svgNode('title',{},item.title); group.append(title);
-    group.append(svgNode('text',{x:0,y:-170,'text-anchor':'middle','font-size':count>16?21:29},item.emoji));
+    const asset=prizeIconAsset(item.emoji);
+    if(asset) {
+      const size=count>16?22:32;
+      group.append(svgNode('image',{href:asset,x:-size/2,y:-182-size/2,width:size,height:size}));
+    } else group.append(svgNode('text',{x:0,y:-170,'text-anchor':'middle','font-size':count>16?21:29},item.emoji));
     group.append(svgNode('text',{x:0,y:-135,'text-anchor':'middle','font-size':count>16?11:count>10?13:16,'font-weight':600,fill:'#674b47'},label));
     svg.append(group);
   });

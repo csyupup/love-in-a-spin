@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "7cfffd8b-6bfa-419c-a657-91712bb7b033",
+      "title": "一杯奶茶",
+      "note": "你最爱的口味，今天我请客",
+      "emoji": "🧋",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "c54d56c3-6712-4afc-a684-6fadb2605e98",
+      "title": "一顿火锅",
+      "note": "一起把喜欢的菜都点一遍",
+      "emoji": "🍲",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "d2ebb1fc-8b18-4d15-8445-71137cc9ae48",
+      "title": "专属按摩券",
+      "note": "肩颈放松 20 分钟，随叫随到",
+      "emoji": "💆🏻‍♀️",
+      "category": "care",
+      "selected": false
+    },
+    {
+      "id": "3f31daf8-4aab-4efb-8563-dfe505e1d25a",
+      "title": "一束花",
+      "note": "让普通的一天也开出花来",
+      "emoji": "💐",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "198c68ee-8f08-4f35-9b6c-bfd6429e1b7e",
+      "title": "约会你来定",
+      "note": "时间、地点和安排，全部听你的",
+      "emoji": "🎬",
+      "category": "dates",
+      "selected": false
+    },
+    {
+      "id": "49ea2fe4-cc4f-47de-b2ed-5bb401634730",
+      "title": "神秘小礼物",
+      "note": "保留一点点未知的快乐",
+      "emoji": "🎁",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "445e6eca-54b8-47ef-b257-2e9348d027fb",
+      "title": "公主抱",
+      "note": "不计时，抱到你满意为止",
+      "emoji": "🫂",
+      "category": "care",
+      "selected": false
+    },
+    {
+      "id": "40bd0064-5c5a-4ae7-b8bf-6a9eaa412f6e",
+      "title": "玩偶一只",
+      "note": "挑一只喜欢的玩偶，带回家陪你。",
+      "emoji": "🧸",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "cc5015f6-27ae-4e75-9f3e-6afc55c80b03",
+      "title": "深夜小烧烤",
+      "note": "找一家小店，边吃边聊今天的事",
+      "emoji": "🍢",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "da252604-3b58-4c36-be97-feb6a19c7ff6",
+      "title": "早餐投喂计划",
+      "note": "为你准备一份热乎乎的早餐",
+      "emoji": "🥐",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "bcee6388-6dc0-4d83-9adf-42844ce7d8fd",
+      "title": "周末去看海",
+      "note": "挑一个晴天，吹吹海风，拍拍合照",
+      "emoji": "🌊",
+      "category": "dates",
+      "selected": false
+    },
+    {
+      "id": "6df117fb-3158-4975-9e90-2fd5ae6bc089",
+      "title": "公园慢慢散步",
+      "note": "牵手走一段路，顺便聊些小事",
+      "emoji": "🌳",
+      "category": "dates",
+      "selected": false
+    },
+    {
+      "id": "e42fb821-9f66-4350-a02e-30eba5e38b8d",
+      "title": "一次短途旅行",
+      "note": "去附近的小城，过一个轻松的周末",
+      "emoji": "🧳",
+      "category": "dates",
+      "selected": false
+    },
+    {
+      "id": "0bc83433-f3c6-48cb-b319-b7a5f3860dc0",
+      "title": "一起看日落",
+      "note": "带上饮料，等天空慢慢变成橘子色",
+      "emoji": "🌅",
+      "category": "dates",
+      "selected": false
+    },
+    {
+      "id": "abf0e3d9-7a8a-4b42-b738-a8b301bf8f22",
+      "title": "专属陪伴券",
+      "note": "留出一段时间，陪你做想做的事",
+      "emoji": "💌",
+      "category": "care",
+      "selected": false
+    },
+    {
+      "id": "14c6f42d-5e82-431a-8d0b-c476b547cc55",
+      "title": "今日夸夸充电站",
+      "note": "认真说出你的五个可爱之处",
+      "emoji": "✨",
+      "category": "care",
+      "selected": false
+    },
+    {
+      "id": "bb0ba6bb-fec2-4d5c-8251-879fa292776c",
+      "title": "家务休息一天",
+      "note": "今天的家务交给我，你安心休息",
+      "emoji": "🧹",
+      "category": "care",
+      "selected": false
+    },
+    {
+      "id": "09e91716-f955-43ed-9cba-f009d071e484",
+      "title": "手写小情书",
+      "note": "写下一些平时没好意思说的话",
+      "emoji": "✉️",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "8aa08692-6fce-4363-b3b3-3a0f2deac464",
+      "title": "源麦甜",
+      "note": "蓝莓芒果奶冻。",
+      "emoji": "🍮",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "14a7e3a1-6837-440c-81c3-62ff04e3149e",
+      "title": "麦当劳",
+      "note": "鸡翅、薯条、汉堡。",
+      "emoji": "mcd",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "e91ec398-b9b2-4bba-86e4-942d25441f89",
+      "title": "KFC",
+      "note": "蛋挞。",
+      "emoji": "🥧",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "42df6096-eda6-428f-a646-f56f84e09996",
+      "title": "古茗",
+      "note": "抹茶生椰麻薯、生椰拿铁。",
+      "emoji": "🧋",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "8da5c195-92c8-4c50-91c4-077eccb453e5",
+      "title": "零食",
+      "note": "薯片、虾条、辣条、巧克力尖尖、酸笋、喔喔奶糖、金丝猴奶糖。",
+      "emoji": "🍫",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "717d2eac-6a91-4157-a8c9-69c66c337dd3",
+      "title": "几多全",
+      "note": "曲奇、鸭货、沙琪玛、酸梅饮料、榴莲千层。",
+      "emoji": "🍪",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "75e2a994-0dcc-44b2-81cb-d8a6e7d7433e",
+      "title": "现金红包",
+      "note": "金额 = 微信骰子点数 × 10 元，掷出几点就发几十元。",
+      "emoji": "🧧",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "6ec94494-88b6-41b2-8571-00242556edd1",
+      "title": "口红",
+      "note": "挑一支喜欢的口红，品牌和色号由你选。",
+      "emoji": "💄",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "f66e04b0-5061-468a-96fe-9e5c39adab7b",
+      "title": "生活用品",
+      "note": "选喜欢或需要的生活用品，让日常更舒服一点。",
+      "emoji": "🧴",
+      "category": "food",
+      "selected": false
+    },
+    {
+      "id": "157b4b9c-2854-41fc-b2d0-1d22b80d6786",
+      "title": "精品店",
+      "note": "逛一家精品店，进店挑一件喜欢的小东西。",
+      "emoji": "🛍️",
+      "category": "food",
+      "selected": false
+    }
+  ]
+}

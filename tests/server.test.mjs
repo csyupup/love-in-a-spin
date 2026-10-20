@@ -13,10 +13,14 @@ test('HTTP API supports two clients sharing a room, safe mutations and persisten
   }
   try {
     assert.equal((await fetch(base)).status,200);
+    const brandIcon=await fetch(base+'/icons/mcdonalds.svg');
+    assert.equal(brandIcon.status,200);
+    assert.match(brandIcon.headers.get('content-type'),/image\/svg\+xml/);
+    assert.match(await brandIcon.text(),/<svg/);
     assert.equal((await call('/api/state')).status,401);
     const created=await call('/api/rooms',null,{}); assert.equal(created.status,201);
     const {token} = created.body; let state=created.body.state;
-    const changed=await call('/api/actions',token,{revision:state.revision,action:{type:'add',item:{title:'共同的小心愿',category:'gifts',emoji:'🎁',selected:true}}});
+    const changed=await call('/api/actions',token,{revision:state.revision,action:{type:'add',item:{title:'共同的小心愿',category:'food',emoji:'🎁',selected:true}}});
     assert.equal(changed.status,200); state=changed.body;
     const secondClient=await call('/api/state',token);
     assert.equal(secondClient.body.items.at(-1).title,'共同的小心愿');
@@ -41,7 +45,7 @@ test('UTF-8 Chinese text remains intact when a character crosses HTTP chunk boun
   const {server,store}=createApplication({dbPath:':memory:'});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const {token,state}=store.createRoom();
-  const body=Buffer.from(JSON.stringify({revision:state.revision,action:{type:'add',item:{title:'奶茶',emoji:'🧋',category:'likes',selected:true}}}));
+  const body=Buffer.from(JSON.stringify({revision:state.revision,action:{type:'add',item:{title:'奶茶',emoji:'🧋',category:'food',selected:true}}}));
   const split=body.indexOf(Buffer.from('奶'))+1;
   try {
     const result=await new Promise((resolve,reject)=>{

@@ -19,8 +19,8 @@ test('the winning sector center lands under the top pointer after multiple turns
   }
 });
 test('validate titles, notes, category, booleans and emoji; preserve safe plain text', () => {
-  assert.deepEqual(validateItem({title:'  一杯奶茶  ',note:' 少冰 ',emoji:'🧋',category:'likes',selected:true}), {title:'一杯奶茶',note:'少冰',emoji:'🧋',category:'likes',selected:true});
+  assert.deepEqual(validateItem({title:'  一杯奶茶  ',note:' 少冰 ',emoji:'🧋',category:'food',selected:true}), {title:'一杯奶茶',note:'少冰',emoji:'🧋',category:'food',selected:true});
   for (const data of [{title:''},{title:'a'.repeat(25)},{title:'a',category:'oops'},{title:'a',selected:'yes'},{title:'a',note:'a'.repeat(81)}]) {
-    assert.throws(() => validateItem({emoji:'🎁',category:'gifts',selected:false,...data}), DomainError);
+    assert.throws(() => validateItem({emoji:'🎁',category:'food',selected:false,...data}), DomainError);
   }
 });
