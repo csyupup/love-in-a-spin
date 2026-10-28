@@ -1,0 +1,65 @@
+[
+  {
+    "key": "kfc",
+    "name": "肯德基",
+    "file": "kfc.png",
+    "page": "https://www.kfc.com.cn/",
+    "url": "https://www.kfc.com.cn/static/new/logo.png",
+    "sha256": "0f903411c672e6ef9c53b01bfa86b65310de27ed703c27d7485b0c0dc9a4cfc4",
+    "retrieved": "2026-10-28"
+  },
+  {
+    "key": "dominos",
+    "name": "达美乐",
+    "file": "dominos.png",
+    "page": "https://www.dominos.com.cn/",
+    "url": "https://www.dominos.com.cn/assets/img/logo.3ae26237.png",
+    "sha256": "bf49dced508757480971590d35f5bd3bc7e4e5c04364240a93be902baebb1bad",
+    "retrieved": "2026-10-28"
+  },
+  {
+    "key": "pizzahut",
+    "name": "必胜客",
+    "file": "pizza-hut.png",
+    "page": "https://www.pizzahut.com.cn/",
+    "url": "https://static.pizzahut.com.cn/PC/Content/images/logo.png",
+    "sha256": "baa54d3fa40f336d1cd57b04019367bf39d7b6640104312d95a019d341625934",
+    "retrieved": "2026-10-28"
+  },
+  {
+    "key": "luckin",
+    "name": "瑞幸咖啡",
+    "file": "luckin.ico",
+    "page": "https://www.lkcoffee.com/",
+    "url": "https://www.lkcoffee.com/favicon.ico",
+    "sha256": "8bb3de0a5bdc28509def31ee1c174c8aeef2b7331f350b750a6abb7de96e5c91",
+    "retrieved": "2026-10-28"
+  },
+  {
+    "key": "sbux",
+    "name": "星巴克",
+    "file": "starbucks.svg",
+    "page": "https://www.starbucks.com.cn/",
+    "url": "https://www-static.chinacdn.starbucks.com.cn/prod/assets/images/logo.svg",
+    "sha256": "00e04cee9744b79fc1d20483de5d9f7a13907c02f0c9915e88745a27e861bd31",
+    "retrieved": "2026-10-28"
+  },
+  {
+    "key": "guming",
+    "name": "古茗",
+    "file": "guming.png",
+    "page": "https://gumingnc.com/",
+    "url": "https://g.gumingnc.com/u/v1C3hdxA/3w.png",
+    "sha256": "d389a604fdff6aa26e83bfce13912ad375c62887cba6362a2e00f202fc20d1b8",
+    "retrieved": "2026-10-28"
+  },
+  {
+    "key": "mixue",
+    "name": "蜜雪冰城",
+    "file": "mixue.ico",
+    "page": "https://www.mxbc.com/",
+    "url": "https://www.mxbc.com/static/img/favicon.ico",
+    "sha256": "7741b9e8212280d68aa0b6edbfd509e78bca52d756458a33ad58f25533d55e98",
+    "retrieved": "2026-10-28"
+  }
+]

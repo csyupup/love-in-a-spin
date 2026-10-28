@@ -39,3 +39,22 @@
 .modal-footer .form-error:not(:empty){margin:0 0 9px;min-height:0}
 .modal::backdrop{touch-action:none;overscroll-behavior:none}
 @media(max-width:760px){.item-modal{padding:0}.modal-header{padding:16px 22px 15px}.modal-header h2{font-size:23px}.modal-scroll{padding:0 14px 14px 22px}.modal-footer{padding:13px 22px 18px}}
+
+/* A pocket of icons, grouped without losing the current choice. */
+.item-modal fieldset{min-inline-size:0}
+.emoji-options>.emoji-picker{display:block;min-width:0}
+.emoji-tabs{display:flex;flex-wrap:nowrap;gap:3px;padding:3px;margin-bottom:10px;background:#f4eee5;border:1px solid #e9dfd2;border-radius:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#d4bcac transparent}
+.emoji-tabs>[role=tab]{flex:1 0 auto;min-height:28px;padding:4px 10px;border-radius:6px;font-size:11px;color:#9a8273;white-space:nowrap}
+.emoji-tabs>[role=tab][aria-selected=true]{color:var(--pink);background:#fffcf6;box-shadow:0 1px 4px #79553e0d}
+.emoji-tabs>[role=tab]:hover{color:var(--pink)}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(35px,1fr));gap:4px;align-content:start;height:212px;overflow-y:auto;overscroll-behavior-y:contain;padding:4px 3px 6px 0;scrollbar-width:thin;scrollbar-color:#d4bcac transparent}
+.emoji-grid[hidden]{display:none}
+.emoji-grid .emoji-pick{display:grid;place-items:center;min-width:0;min-height:38px;padding:3px;font-size:23px;line-height:1}
+.emoji-selection{display:flex;align-items:center;gap:8px;min-height:39px;margin-top:8px;padding:5px 0 0;border-top:1px dashed #e9dfd2;font-size:10px;color:#9a8273}
+#current-emoji{display:inline-flex;align-items:center;justify-content:center;min-width:29px;min-height:29px;border:1px solid #e6c4c6;border-radius:7px;background:#fbefeb;font-size:21px}
+.emoji-selection-hint{margin-left:auto;font-size:9px;color:#b3a08b}
+@media(max-width:400px){.emoji-tabs>[role=tab]{padding-inline:10px;flex-grow:0}.emoji-grid{height:194px}.emoji-selection-hint{font-size:8px}}
+
+/* Show the emblem from the official horizontal brand lockups. */
+.prize-brand-icon.brand-kfc{object-fit:cover;object-position:left center}
+.prize-brand-icon.brand-pizzahut{object-fit:cover;object-position:6% center}

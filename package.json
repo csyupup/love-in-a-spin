@@ -11,6 +11,6 @@
     "start:legacy": "node src/server.mjs",
     "build": "node scripts/build-pages.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check public/app.js && node --check public/browser-store.js && node --check public/validation.js && node --check public/wheel.js && node --check public/sync.js && node --check public/prize-icons.js && node --check public/scroll-lock.js && node --check scripts/build-pages.mjs && node --check scripts/serve-static.mjs"
+    "check": "node --check public/app.js && node --check public/browser-store.js && node --check public/validation.js && node --check public/wish-updates.js && node --check public/wheel.js && node --check public/sync.js && node --check public/prize-icons.js && node --check public/scroll-lock.js && node --check scripts/build-pages.mjs && node --check scripts/serve-static.mjs"
   }
 }

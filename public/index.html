@@ -75,7 +75,13 @@
         <p class="modal-description">认真记下的喜欢，都会变成惊喜。</p>
       </header>
       <div class="modal-scroll">
-        <label class="form-label">小惊喜的名字<input name="title" id="item-title" placeholder="比如：周末一起去看海" required maxlength="48" autocomplete="off"></label><fieldset class="category-options"><legend>放在哪个小口袋？</legend><label><input type="radio" name="category" value="food" checked><span>🧋 吃喝玩乐</span></label><label><input type="radio" name="category" value="dates"><span>🎬 约会时光</span></label><label><input type="radio" name="category" value="care"><span>💌 专属宠爱</span></label></fieldset><fieldset class="emoji-options"><legend>挑一个小图标</legend><div id="emoji-options"></div></fieldset><label class="form-label">给它留句话 <small>选填，最多 80 字</small><textarea name="note" id="item-note" rows="2" placeholder="把只有你们懂的小细节写在这里…" maxlength="160"></textarea></label><label class="include-option"><input type="checkbox" name="selected" checked>同时放进这次的转盘</label>
+        <label class="form-label">小惊喜的名字<input name="title" id="item-title" placeholder="比如：周末一起去看海" required maxlength="48" autocomplete="off"></label><fieldset class="category-options"><legend>放在哪个小口袋？</legend><label><input type="radio" name="category" value="food" checked><span>🧋 吃喝玩乐</span></label><label><input type="radio" name="category" value="dates"><span>🎬 约会时光</span></label><label><input type="radio" name="category" value="care"><span>💌 专属宠爱</span></label></fieldset><fieldset class="emoji-options"><legend>挑一个小图标</legend>
+          <div class="emoji-picker">
+            <div id="emoji-tabs" class="emoji-tabs" role="tablist" aria-label="小图标分类"></div>
+            <div id="emoji-panels"></div>
+            <p class="emoji-selection" aria-live="polite">已选图标 <span id="current-emoji" role="img"></span><span class="emoji-selection-hint">挑一份心情，记下这份喜欢</span></p>
+          </div>
+        </fieldset><label class="form-label">给它留句话 <small>选填，最多 80 字</small><textarea name="note" id="item-note" rows="2" placeholder="把只有你们懂的小细节写在这里…" maxlength="160"></textarea></label><label class="include-option"><input type="checkbox" name="selected" checked>同时放进这次的转盘</label>
       </div>
       <footer class="modal-footer">
         <p class="form-error" id="item-error" role="alert"></p>

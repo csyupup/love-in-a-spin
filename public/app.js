@@ -1,17 +1,18 @@
 import { renderWheel, spinTarget } from './wheel.js';
 import { shouldApplyRemoteState } from './sync.js';
-import { prizeIconHtml, prizeIconLabel } from './prize-icons.js';
+import { prizeIconHtml, prizeIconLabel, iconGroups, iconCategory, categoryIcons } from './prize-icons.js';
 import { createScrollLock } from './scroll-lock.js';
-import { BrowserStore } from './browser-store.js';
+import { BrowserStore, sortWishes } from './browser-store.js';
+import { MAX_WISHES } from './validation.js';
+import { WISH_CATALOG_VERSION, WISH_ADDITIONS, WISH_REFINEMENT_VERSION, WISH_REFINEMENTS } from './wish-updates.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const icon = name => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 const escape = value => String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const categories={food:'吃喝玩乐',dates:'约会时光',care:'专属宠爱'};
-const emojiChoices=['mcd','🍔','🍟','🍗','🍕','🌮','🍜','🍣','🥟','🍚','🍲','🍢','🥐','🧋','☕️','🥤','🍰','🍦','🍩','🍓','🍮','🥧','🍫','🍪','🎬','🎡','🎢','🎤','🎮','📷','🌊','🌳','🧳','🌅','💆🏻‍♀️','🫂','💌','💋','✨','🛁','🧹','🛌','💐','🎁','🧧','🧸','🧴','🛍️','📖','✉️','💍','💄','👜','👗','🌷'];
 let state=null,category='food',search='',busy=false,spinning=false,editingId=null,editingRevision=0,deletingId=null;
-let selectedEmoji='🎁',angle=0,wheelSignature='',sound=false,audioContext,tickTimer,toastTimer,showAllHistory=false,connecting=false,pendingRefresh=false;
+let selectedEmoji='🎁',emojiCategory='objects',angle=0,wheelSignature='',sound=false,audioContext,tickTimer,toastTimer,showAllHistory=false,connecting=false,pendingRefresh=false;
 const pageScrollLock=createScrollLock();
 const browserStore=new BrowserStore();
 const emptyHistoryMarkup=$('#history-list').innerHTML;
@@ -29,13 +30,13 @@ function setConnection(online,message='') {
   $('#connection-message').textContent=message || '本机数据暂未保存，请检查浏览器存储权限后重试。';
 }
 function activeItems() {return state?.items.filter(item=>item.selected)||[];}
-function visibleItems() {return state?.items.filter(item=>item.category===category&&(!search||`${item.title} ${item.note}`.toLowerCase().includes(search)))||[];}
+function visibleItems() {return sortWishes(state?.items||[]).filter(item=>item.category===category&&(!search||`${item.title} ${item.note}`.toLowerCase().includes(search)));}
 function updateControls() {
   const locked=busy||spinning||!state;
   $('#workspace').setAttribute('aria-busy',String(locked));
   $('#spin-button').disabled=locked||!activeItems().length;
   $('#center-spin').disabled=locked||!activeItems().length;
-  $('#add-button').disabled=locked||state.items.length>=32;
+  $('#add-button').disabled=locked||state.items.length>=MAX_WISHES;
   $('#select-all').disabled=locked||!visibleItems().length;
   $('#clear-selection').disabled=locked||!activeItems().length;
   $$('.wish-row input,.wish-actions button,.redeem-button').forEach(node=>{node.disabled=locked;});
@@ -61,7 +62,7 @@ function renderItems() {
     container.innerHTML=`<div class="no-items"><span aria-hidden="true">${search?'⌕':'♡'}</span><p>${search?'没有找到这份小心愿':'这个小口袋还是空的'}</p><small>${search?'试试换个关键词吧':'把你们喜欢的事，慢慢收藏进来。'}</small>${search?'':'<button class="text-button" id="empty-add">＋ 添加第一份心愿</button>'}</div>`;
     $('#empty-add')?.addEventListener('click',()=>openItem());
   } else {
-    container.innerHTML=items.map(item=>`<div class="wish-row ${item.selected?'is-selected':''}" data-id="${escape(item.id)}"><label class="wish-row-label"><input type="checkbox" ${item.selected?'checked':''} data-select="${escape(item.id)}" aria-label="将${escape(item.title)}加入转盘"><span class="wish-emoji" aria-hidden="true">${prizeIconHtml(item.emoji)}</span><span class="wish-details"><span class="wish-title">${escape(item.title)}</span><span class="wish-note">${escape(item.note||categories[item.category])}</span></span></label><div class="wish-actions"><button class="icon-button" data-edit="${escape(item.id)}" aria-label="编辑${escape(item.title)}">${icon('edit')}</button><button class="icon-button" data-delete="${escape(item.id)}" aria-label="删除${escape(item.title)}">${icon('trash')}</button></div></div>`).join('');
+    container.innerHTML=items.map(item=>`<div class="wish-row ${item.selected?'is-selected':''}" data-id="${escape(item.id)}"><label class="wish-row-label"><input type="checkbox" ${item.selected?'checked':''} data-select="${escape(item.id)}" aria-label="将${escape(item.title)}加入转盘"><span class="wish-emoji" aria-hidden="true">${prizeIconHtml(item.emoji)}</span><span class="wish-details"><span class="wish-title">${escape(item.title)}</span><span class="wish-note">${escape(item.note||'')}</span></span></label><div class="wish-actions"><button class="icon-button" data-edit="${escape(item.id)}" aria-label="编辑${escape(item.title)}">${icon('edit')}</button><button class="icon-button" data-delete="${escape(item.id)}" aria-label="删除${escape(item.title)}">${icon('trash')}</button></div></div>`).join('');
   }
   const allSelected=items.length>0&&items.every(item=>item.selected);
   $('#select-all').textContent=allSelected?'取消本页勾选':'全选';
@@ -108,14 +109,48 @@ function openItem(id=null) {
   const chosen=item?.category||category;
   $(`#item-form input[name=category][value=${chosen}]`).checked=true;
   $('#item-form input[name=selected]').checked=item?.selected??true;
-  selectedEmoji=item?.emoji||'🎁';renderEmojis();
+  selectedEmoji=item?.emoji||'🎁';emojiCategory=iconCategory(selectedEmoji);renderEmojis();
   showDialog($('#item-dialog'));$('.modal-scroll').scrollTop=0;$('#item-title').focus({preventScroll:true});
 }
 function renderEmojis() {
-  const choices=emojiChoices.includes(selectedEmoji)?emojiChoices:[selectedEmoji,...emojiChoices];
-  $('#emoji-options').innerHTML=choices.map(emoji=>`<button type="button" class="emoji-pick" data-emoji="${escape(emoji)}" title="${escape(prizeIconLabel(emoji))}" aria-label="选择图标 ${escape(prizeIconLabel(emoji))}" aria-pressed="${emoji===selectedEmoji}">${prizeIconHtml(emoji)}</button>`).join('');
+  $('#emoji-tabs').innerHTML=iconGroups.map(group=>`<button type="button" role="tab" id="emoji-tab-${group.id}" data-icon-category="${group.id}" aria-controls="emoji-panel-${group.id}">${group.label}</button>`).join('');
+  $('#emoji-panels').innerHTML=iconGroups.map(group=>`<div role="tabpanel" class="emoji-grid" id="emoji-panel-${group.id}" aria-labelledby="emoji-tab-${group.id}">${categoryIcons(group.id,selectedEmoji).map(emoji=>`<button type="button" class="emoji-pick" data-emoji="${escape(emoji)}" title="${escape(prizeIconLabel(emoji))}" aria-label="选择图标 ${escape(prizeIconLabel(emoji))}">${prizeIconHtml(emoji)}</button>`).join('')}</div>`).join('');
+  switchEmojiCategory(emojiCategory);updateEmojiSelection();
 }
-$('#emoji-options').addEventListener('click',event=>{const node=event.target.closest('[data-emoji]');if(node){selectedEmoji=node.dataset.emoji;renderEmojis();}});
+function switchEmojiCategory(categoryId) {
+  emojiCategory=categoryId;
+  $$('#emoji-tabs [role=tab]').forEach(tab=>{
+    const active=tab.dataset.iconCategory===categoryId;
+    tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;
+    document.getElementById(tab.getAttribute('aria-controls')).hidden=!active;
+  });
+}
+function revealEmojiTab(tab) {
+  const strip=tab.parentElement,edge=strip.getBoundingClientRect(),box=tab.getBoundingClientRect();
+  if(box.left<edge.left)strip.scrollBy({left:box.left-edge.left-4});
+  else if(box.right>edge.right)strip.scrollBy({left:box.right-edge.right+4});
+}
+function updateEmojiSelection() {
+  $$('#emoji-panels [data-emoji]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.emoji===selectedEmoji)));
+  $('#current-emoji').innerHTML=prizeIconHtml(selectedEmoji);
+  $('#current-emoji').setAttribute('aria-label',prizeIconLabel(selectedEmoji));
+}
+$('#emoji-tabs').addEventListener('click',event=>{
+  const tab=event.target.closest('[data-icon-category]');
+  if(tab){switchEmojiCategory(tab.dataset.iconCategory);revealEmojiTab(tab);}
+});
+$('#emoji-tabs').addEventListener('keydown',event=>{
+  const tab=event.target.closest('[data-icon-category]');if(!tab)return;
+  const tabs=$$('#emoji-tabs [role=tab]'),index=tabs.indexOf(tab);let next;
+  if(event.key==='ArrowRight')next=(index+1)%tabs.length;
+  if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;
+  if(event.key==='Home')next=0;if(event.key==='End')next=tabs.length-1;
+  if(next!=null){event.preventDefault();switchEmojiCategory(tabs[next].dataset.iconCategory);tabs[next].focus({preventScroll:true});revealEmojiTab(tabs[next]);}
+});
+$('#emoji-panels').addEventListener('click',event=>{
+  const button=event.target.closest('[data-emoji]');
+  if(button){selectedEmoji=button.dataset.emoji;updateEmojiSelection();}
+});
 $('#item-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy)return;
   const data=new FormData(event.currentTarget);
@@ -123,7 +158,7 @@ $('#item-form').addEventListener('submit',async event=>{
   $('#save-item').disabled=true;$('#item-error').textContent='';
   try {
     const saved=await mutate(editingId?{type:'edit',id:editingId,item}:{type:'add',item},editingRevision);
-    if(saved){$('#item-dialog').close();toast(editingId?'这份喜欢，记好啦':'又收藏了一份小美好 ♡');}
+    if(saved){if(!editingId)$('#item-list').scrollTop=0;$('#item-dialog').close();toast(editingId?'这份喜欢，记好啦':'又收藏了一份小美好 ♡');}
   } catch(error){$('#item-error').textContent=error.message;editingRevision=state.revision;}
   finally{$('#save-item').disabled=false;}
 });
@@ -211,7 +246,7 @@ async function spin() {
     clearInterval(tickTimer);failure(error);
     if(error.status===409||drawn)await refresh(true);
   } finally {
-    spinning=false;$('#workspace').classList.remove('is-spinning');render();if(pendingRefresh)refresh();
+    spinning=false;$('#workspace').classList.remove('is-spinning');render();if(drawn)$('#item-list').scrollTop=0;if(pendingRefresh)refresh();
   }
 }
 $('#spin-button').addEventListener('click',spin);$('#center-spin').addEventListener('click',spin);
@@ -226,15 +261,18 @@ async function connect() {
       if(!response.ok)throw new Error('初始心愿暂未加载完成，请刷新页面重试。');
       const initial=await response.json();state=await browserStore.initialize(initial.items);
     }
+    state=await browserStore.upgradeCatalog(WISH_CATALOG_VERSION,WISH_ADDITIONS);
+    state=await browserStore.refineCatalog(WISH_REFINEMENT_VERSION,WISH_REFINEMENTS,WISH_ADDITIONS.map(item=>item.id));
     if(new URLSearchParams(location.hash.slice(1)).has('r'))history.replaceState(null,'',location.pathname+location.search);
     setConnection(true);render();
   } catch(error) {
     setConnection(false,error.message);
-    if(!state)$('#item-list').innerHTML='<div class="no-items"><span aria-hidden="true">♡</span><p>心愿清单暂未加载</p><small>请根据下方提示，检查网络或浏览器存储权限。</small></div>';
+    if(state)render();
+    else $('#item-list').innerHTML='<div class="no-items"><span aria-hidden="true">♡</span><p>心愿清单暂未加载</p><small>请根据下方提示，检查网络或浏览器存储权限。</small></div>';
     updateControls();
   } finally{connecting=false;}
 }
-$('#retry-button').addEventListener('click',()=>state?refresh(true):connect());
+$('#retry-button').addEventListener('click',connect);
 window.addEventListener('storage',event=>{if(event.key===browserStore.key)refresh();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
 connect();

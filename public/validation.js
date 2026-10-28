@@ -1,3 +1,5 @@
+export const MAX_WISHES = 64;
+
 export class DomainError extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
 }

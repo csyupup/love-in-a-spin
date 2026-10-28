@@ -9,7 +9,7 @@ const root=resolve(option('--dir',fileURLToPath(new URL('../public/',import.meta
 const port=Number(option('--port',process.env.PORT||4173));
 const host=option('--host',process.env.HOST||'127.0.0.1');
 const base=option('--base','/').replace(/\/?$/,'/');
-const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml'};
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.ico':'image/vnd.microsoft.icon','.jpg':'image/jpeg','.webp':'image/webp'};
 const server=createServer(async(req,res)=>{
   try {
     let path=decodeURIComponent(new URL(req.url,'http://local').pathname);

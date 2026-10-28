@@ -30,15 +30,15 @@ export function renderWheel(svg, items) {
       svg.append(svgNode('path',{d:`M220 220 L${start.join(' ')} A${radius} ${radius} 0 ${slice>180?1:0} 1 ${end.join(' ')} Z`,fill:colors[index%colors.length],stroke:'#fff9ef','stroke-width':2}));
     }
     const group=svgNode('g',{transform:`translate(220 220) rotate(${angle})`});
-    const limit = count>16 ? 3 : count>10 ? 4 : 7;
+    const limit = count>40 ? 1 : count>24 ? 2 : count>16 ? 3 : count>10 ? 4 : 7;
     const label = [...item.title].length>limit ? [...item.title].slice(0,limit).join('')+'…' : item.title;
     const title=svgNode('title',{},item.title); group.append(title);
     const asset=prizeIconAsset(item.emoji);
     if(asset) {
-      const size=count>16?22:32;
+      const size=count>40?11:count>24?15:count>16?22:32;
       group.append(svgNode('image',{href:asset,x:-size/2,y:-182-size/2,width:size,height:size}));
-    } else group.append(svgNode('text',{x:0,y:-170,'text-anchor':'middle','font-size':count>16?21:29},item.emoji));
-    group.append(svgNode('text',{x:0,y:-135,'text-anchor':'middle','font-size':count>16?11:count>10?13:16,'font-weight':600,fill:'#674b47'},label));
+    } else group.append(svgNode('text',{x:0,y:-170,'text-anchor':'middle','font-size':count>40?11:count>24?15:count>16?21:29},item.emoji));
+    group.append(svgNode('text',{x:0,y:-135,'text-anchor':'middle','font-size':count>40?7:count>24?9:count>16?11:count>10?13:16,'font-weight':600,fill:'#674b47'},label));
     svg.append(group);
   });
 }

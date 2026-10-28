@@ -10,7 +10,7 @@ test('every equally sized index is reachable and receives the full range', () =>
   assert.throws(() => chooseIndex(0), DomainError);
 });
 test('the winning sector center lands under the top pointer after multiple turns', () => {
-  for (let n = 1; n <= 32; n++) for (let i = 0; i < n; i++) {
+  for (let n = 1; n <= 64; n++) for (let i = 0; i < n; i++) {
     const current = 1371;
     const target = spinTarget(current, i, n);
     assert.ok(target - current >= 1800);
