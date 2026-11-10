@@ -4,7 +4,7 @@ import { request } from 'node:http';
 import { createApplication } from '../src/server.mjs';
 
 test('HTTP API supports two clients sharing a room, safe mutations and persistent draws', async () => {
-  const {server,store} = createApplication({dbPath:':memory:'});
+  const {server,store} = createApplication({dbPath:':memory:',allowRoomCreation:true});
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   async function call(path,token,body,method=body?'POST':'GET') {

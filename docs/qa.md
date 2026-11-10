@@ -105,3 +105,14 @@ Local preview only, not internet-hosted. Remote phone sharing requires a Node se
 - 修复：图标按钮使用 Grid 双向居中，并设独立行高；选中边框和图标共用同一个布局盒。
 - 桌面八个品牌最大横向误差小于 0.004px，纵向误差为 0；390×844 手机尺寸八个品牌横纵误差均为 0。恢复默认视口。
 - 36 项测试、语法检查、静态构建及 diff 空白检查通过；最终只读复核无重要问题。
+
+## 2026-11-10 shared backend
+
+- 42 tests pass locally and under the deployed Node 24 container. Production keeps HTTP room creation disabled; API test fixtures explicitly opt into their own in-memory room creation.
+- Two independent browser clients share a new blank-note Starbucks wish, selected state, a draw and its redemption. Mobile 390×844 has no horizontal overflow; modal scroll stays inside and the background is fixed.
+- Native browser fetch receiver regression corrected; guarded reconnects reuse revision-aware refresh instead of replacing state unconditionally.
+- Maximum 64-item / 100-full-snapshot pretty JSON backup round-trips; file limit is 16 MiB and normalized API/proxy limit 8 MiB.
+- Deployed Docker container is healthy, publishes only on 127.0.0.1:3000, retains QA state after restart, and permits Pages CORS while rejecting foreign origins and stale revisions.
+- Trusted IP certificate issued; internal HTTPS health check, Certbot renewal dry-run and restored SQLite backup integrity checks passed. Daily backup and twice-daily renewal timers enabled.
+- Dedicated production room retains 35 unchecked defaults and empty history. All mutations were performed in disposable QA rooms.
+- Public HTTPS and final Pages integration await cloud firewall TCP 443 access; do not claim public release until those checks pass.
