@@ -64,6 +64,7 @@
       <section class="history-section" aria-labelledby="history-title"><div class="history-heading"><div><span class="section-kicker">OUR LITTLE MEMORIES</span><h2 id="history-title">幸福，有迹可循<span class="tiny-star" aria-hidden="true">✧</span></h2></div><button class="text-button" id="history-more" hidden>查看全部 <span aria-hidden="true">↗</span></button></div><div id="history-list" class="history-list"><div class="history-empty"><span aria-hidden="true">✉</span><p>第一份小幸运，还在等你开启。<small>每一次心动，都会好好记在这里。</small></p><span class="empty-dashes" aria-hidden="true">♡ · · · · · · · · · · · ♡</span></div></div></section>
       <div class="connection-banner" id="connection-banner" hidden role="alert"><span id="connection-message"></span><button class="text-button" id="retry-button">重新加载</button></div>
     </main>
+    <div class="data-tools"><button class="text-button" id="export-data" disabled>备份清单</button><span aria-hidden="true">·</span><button class="text-button" id="import-data" disabled>导入备份</button><button class="text-button" id="export-local" hidden>导出本机旧清单</button><input type="file" id="import-file" accept=".json,application/json" hidden></div>
     <footer class="site-footer"><span>Love in a Spin <span aria-hidden="true">♡</span></span><p>把平凡的日子，过成值得期待的样子。</p><span>JUST YOU & ME</span></footer>
   </div>
 
@@ -92,6 +93,7 @@
 
 
   <dialog id="delete-dialog" class="modal confirm-modal" aria-labelledby="delete-title"><span class="confirm-emoji" aria-hidden="true">💌</span><h2 id="delete-title">把这份心愿移出清单？</h2><p id="delete-description"></p><p class="modal-description">已经抽中的幸福记录会为你保留。</p><div class="confirm-actions"><button class="button button-outline close-dialog">再想想</button><button class="button button-primary" id="confirm-delete">确定移除</button></div></dialog>
+  <dialog id="import-dialog" class="modal confirm-modal" aria-labelledby="import-title"><span class="confirm-emoji" aria-hidden="true">💌</span><h2 id="import-title">导入这份心愿备份？</h2><p id="import-description"></p><p class="modal-description">确认时会先下载当前清单的备份，请妥善保存。</p><p class="form-error" id="import-error" role="alert"></p><div class="confirm-actions"><button class="button button-outline close-dialog">先不导入</button><button class="button button-primary" id="confirm-import">确认导入</button></div></dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div><div class="confetti" id="confetti" aria-hidden="true"></div>
 </body>

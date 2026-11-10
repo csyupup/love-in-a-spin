@@ -1,6 +1,18 @@
 import { DatabaseSync } from 'node:sqlite';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { DomainError, chooseIndex, validateItem } from './domain.mjs';
+import { readFileSync } from 'node:fs';
+import { MAX_WISHES } from '../public/validation.js';
+import { sortWishes, nextWishOrder } from '../public/browser-store.js';
+import { WISH_ADDITIONS, WISH_REFINEMENT_VERSION } from '../public/wish-updates.js';
+import { validateSnapshot } from '../public/snapshot.js';
+
+function currentExamples(){
+  const items=JSON.parse(readFileSync(new URL('../public/initial-wishes.json',import.meta.url),'utf8')).items.map(i=>({...i,selected:false}));
+  const order=nextWishOrder(items);
+  WISH_ADDITIONS.forEach((wish,index)=>{const item=items.find(i=>i.id===wish.id);if(item){item.recentOrder=order;item.recentTie=index;}});
+  return items;
+}
 
 const seeds = [
   ['一杯快乐奶茶','挑一个喜欢的口味，今天我请客','🧋','food',true],
@@ -39,7 +51,7 @@ export class Store {
   close() { this.db.close(); }
   createRoom() {
     const token = randomBytes(32).toString('base64url');
-    const state = { revision:0, catalogVersion:3, items:makeExamples(), history:[] };
+    const state = { revision:0, catalogVersion:3, refinementVersion:WISH_REFINEMENT_VERSION, items:currentExamples(), history:[] };
     this.db.prepare('INSERT INTO rooms (token_hash,state) VALUES (?,?)').run(hash(token),JSON.stringify(state));
     return { token, state };
   }
@@ -79,18 +91,23 @@ export class Store {
     const state = this.get(token); this.check(state,revision);
     if (!action || typeof action !== 'object') throw new DomainError('操作不正确');
     switch(action.type) {
+      case 'import': {
+        const snapshot=validateSnapshot(action.snapshot);
+        state.items=snapshot.items;state.history=snapshot.history;
+        state.catalogVersion=3;state.refinementVersion=WISH_REFINEMENT_VERSION;break;
+      }
       case 'reset': {
         state.items.forEach(item=>{item.selected=false;});
         state.history=[];break;
       }
       case 'add': {
-        if (state.items.length >= 32) throw new DomainError('最多收藏 32 个小惊喜，先整理一下吧');
-        state.items.push({id:randomUUID(),...validateItem(action.item)}); break;
+        if (state.items.length >= MAX_WISHES) throw new DomainError(`最多收藏 ${MAX_WISHES} 个小惊喜，先整理一下吧`);
+        state.items.push({id:randomUUID(),...validateItem(action.item),recentOrder:nextWishOrder(state.items)}); break;
       }
       case 'edit': {
         const index = state.items.findIndex(item => item.id === action.id);
         if (index < 0) throw new DomainError('这份小惊喜已被删除',404);
-        state.items[index] = {id:action.id,...validateItem(action.item)}; break;
+        state.items[index] = {...state.items[index],...validateItem(action.item)}; break;
       }
       case 'delete': {
         if (!state.items.some(item => item.id === action.id)) throw new DomainError('这份小惊喜已被删除',404);
@@ -118,6 +135,8 @@ export class Store {
     const items = state.items.filter(item => item.selected);
     const index = chooseIndex(items.length);
     const result = {id:randomUUID(),requestId,item:{...items[index]},index,count:items.length,items:items.map(item => ({...item})),at:new Date().toISOString(),redeemed:false};
+    const order=nextWishOrder(state.items);
+    sortWishes(state.items).filter(item=>item.selected).forEach((item,index)=>{item.recentOrder=order;item.recentTie=index;});
     state.history.unshift(result); state.history = state.history.slice(0,100);
     return {state:this.write(token,state,revision),result};
   }

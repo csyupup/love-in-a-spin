@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily surprise shop backup
+[Timer]
+OnCalendar=*-*-* 04:15:00
+RandomizedDelaySec=900
+Persistent=true
+[Install]
+WantedBy=timers.target

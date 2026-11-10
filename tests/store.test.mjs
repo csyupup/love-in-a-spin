@@ -10,9 +10,9 @@ test('new rooms combine food and gifts into one of three categories', () => {
   const store=new Store(':memory:');
   try {
     const {token,state}=store.createRoom();
-    assert.equal(state.items.length,20);
+    assert.equal(state.items.length,35);
     for(const category of ['food','dates','care']) {
-      assert.equal(state.items.filter(item=>item.category===category).length,category==='food'?10:5);
+      assert.equal(state.items.filter(item=>item.category===category).length,category==='food'?25:5);
       assert.ok(state.items.filter(item=>item.category===category).every(item=>item.note&&item.emoji));
     }
     const item=state.items.find(item=>item.category==='dates');
@@ -118,7 +118,8 @@ test('reset clears every selection and draw record while retaining the complete 
   const store=new Store(':memory:');
   try {
     const {token,state}=store.createRoom();
-    const drawn=store.spin(token,state.revision,'before-publish-reset');
+    const selected=store.mutate(token,state.revision,{type:'select',ids:[state.items[0].id]});
+    const drawn=store.spin(token,selected.revision,'before-publish-reset');
     assert.ok(drawn.state.history.length);
     const reset=store.mutate(token,drawn.state.revision,{type:'reset'});
     assert.deepEqual(reset.items,drawn.state.items.map(item=>({...item,selected:false})));

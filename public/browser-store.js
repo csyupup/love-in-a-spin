@@ -1,4 +1,5 @@
 import { DomainError, validateItem, MAX_WISHES } from './validation.js';
+import { validateSnapshot } from './snapshot.js';
 
 export function uniformIndex(count,source=globalThis.crypto) {
   if(!Number.isInteger(count)||count<1||count>MAX_WISHES)throw new DomainError(`请先选择 1–${MAX_WISHES} 个小惊喜`);
@@ -17,7 +18,7 @@ function orderEntries(items) {
 export function sortWishes(items) {
   return orderEntries(items).sort((a,b)=>b.order-a.order||a.tie-b.tie).map(entry=>entry.item);
 }
-function nextWishOrder(items) {return Math.max(0,...orderEntries(items).map(entry=>entry.order))+1;}
+export function nextWishOrder(items) {return Math.max(0,...orderEntries(items).map(entry=>entry.order))+1;}
 const copy=value=>structuredClone(value);
 export class BrowserStore {
   constructor({storage={getItem:key=>globalThis.localStorage.getItem(key),setItem:(key,value)=>globalThis.localStorage.setItem(key,value)},key=`love-in-a-spin:local:v1:${new URL('./',import.meta.url).pathname}`,locks=globalThis.navigator?.locks,crypto=globalThis.crypto}={}) {
@@ -113,6 +114,11 @@ export class BrowserStore {
     return this.exclusive(()=>{
       const state=this.requireState(revision);
       switch(action?.type) {
+        case 'import': {
+          const snapshot=validateSnapshot(action.snapshot);
+          state.items=snapshot.items;state.history=snapshot.history;
+          state.catalogVersion=1;state.refinementVersion=2;break;
+        }
         case 'add':
           if(state.items.length>=MAX_WISHES)throw new DomainError(`最多收藏 ${MAX_WISHES} 个小惊喜，先整理一下吧`);
           state.items.push({id:this.crypto.randomUUID(),...validateItem(action.item),recentOrder:nextWishOrder(state.items)});break;

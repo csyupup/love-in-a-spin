@@ -1,0 +1,6 @@
+[Unit]
+Description=Back up the surprise shop SQLite database
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /opt/services/love-in-a-spin/deploy/backup.sh
+UMask=0077

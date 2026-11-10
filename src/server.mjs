@@ -1,24 +1,24 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Store } from './store.mjs';
 import { DomainError } from './domain.mjs';
 
-const root = fileURLToPath(new URL('../public/',import.meta.url));
-const assets = new Map([['/',['index.html','text/html; charset=utf-8']],['/index.html',['index.html','text/html; charset=utf-8']],['/style.css',['style.css','text/css; charset=utf-8']],['/app.js',['app.js','text/javascript; charset=utf-8']],['/wheel.js',['wheel.js','text/javascript; charset=utf-8']],['/sync.js',['sync.js','text/javascript; charset=utf-8']],['/scroll-lock.js',['scroll-lock.js','text/javascript; charset=utf-8']],['/prize-icons.js',['prize-icons.js','text/javascript; charset=utf-8']],['/icons/mcdonalds.svg',['icons/mcdonalds.svg','image/svg+xml']],['/favicon.svg',['favicon.svg','image/svg+xml']]]);
-async function readJson(req) {
+const root = resolve(fileURLToPath(new URL('../public/',import.meta.url)));
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.ico':'image/vnd.microsoft.icon','.webp':'image/webp'};
+async function readJson(req,limit=16384) {
   if (!(req.headers['content-type'] || '').startsWith('application/json')) throw new DomainError('请发送 JSON 内容',415);
   const chunks=[]; let size = 0;
-  for await (const chunk of req) { size += chunk.length; if(size>16384) throw new DomainError('内容太长了，请精简一下',413); chunks.push(chunk); }
+  for await (const chunk of req) { size += chunk.length; if(size>limit) throw new DomainError('内容太长了，请精简一下',413); chunks.push(chunk); }
   try {
     const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
     if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error();
     return body;
   } catch { throw new DomainError('内容格式不正确，请重试'); }
 }
-export function createApplication({dbPath = process.env.DATA_PATH || resolve('data/love.db')} = {}) {
+export function createApplication({dbPath = process.env.DATA_PATH || resolve('data/love.db'),allowRoomCreation=process.env.ALLOW_ROOM_CREATION!=='false',allowedOrigins=(process.env.ALLOWED_ORIGINS||'').split(',').filter(Boolean)} = {}) {
   if(dbPath!==':memory:') mkdirSync(dirname(dbPath),{recursive:true});
   const store = new Store(dbPath);
   const creationRates = new Map();
@@ -32,11 +32,17 @@ export function createApplication({dbPath = process.env.DATA_PATH || resolve('da
       const path = new URL(req.url,'http://local').pathname;
       if(path==='/health' && req.method==='GET') return json(200,{ok:true});
       if(path.startsWith('/api/')) {
-        if(req.method==='POST' && req.headers.origin) {
-          let origin; try { origin = new URL(req.headers.origin); } catch { throw new DomainError('请求来源不正确',403); }
-          if(origin.host!==req.headers.host) throw new DomainError('请从本站操作清单',403);
+        if(req.headers.origin) {
+          let origin; try { origin=new URL(req.headers.origin); } catch {throw new DomainError('请求来源不正确',403);}
+          if(!['http:','https:'].includes(origin.protocol)||(!allowedOrigins.includes(origin.origin)&&origin.host!==req.headers.host))throw new DomainError('请从专属网页操作清单',403);
+          res.setHeader('Access-Control-Allow-Origin',origin.origin);
+          res.setHeader('Vary','Origin');
+          if(req.method==='OPTIONS'){
+            res.writeHead(204,{'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Max-Age':'600'});return res.end();
+          }
         }
         if(path==='/api/rooms' && req.method==='POST') {
+          if(!allowRoomCreation)throw new DomainError('请使用已有的专属清单链接',403);
           await readJson(req);
           const ip=req.socket.remoteAddress; const now=Date.now();
           // A bounded, local abuse guard. Real deployments should additionally rate-limit at the proxy.
@@ -49,13 +55,21 @@ export function createApplication({dbPath = process.env.DATA_PATH || resolve('da
         const token = req.headers.authorization?.match(/^Bearer ([A-Za-z0-9_-]+)$/)?.[1];
         if(!token) throw new DomainError('请通过专属清单链接访问',401);
         if(path==='/api/state' && req.method==='GET') return json(200,store.get(token));
+        if(path==='/api/import' && req.method==='POST'){const body=await readJson(req,8*1024*1024);return json(200,store.mutate(token,body.revision,{type:'import',snapshot:body.snapshot}));}
         if(path==='/api/actions' && req.method==='POST') { const body=await readJson(req); return json(200,store.mutate(token,body.revision,body.action)); }
         if(path==='/api/spins' && req.method==='POST') { const body=await readJson(req); return json(200,store.spin(token,body.revision,body.requestId)); }
         throw new DomainError('没有找到这个操作',404);
       }
-      if(!['GET','HEAD'].includes(req.method) || !assets.has(path)) throw new DomainError('这里没有页面哦',404);
-      const [file,type] = assets.get(path);
-      const content = await readFile(resolve(root,file));
+      if(!['GET','HEAD'].includes(req.method))throw new DomainError('这里没有页面哦',404);
+      if(path==='/runtime-config.js'){
+        res.writeHead(200,{'content-type':mime['.js'],'cache-control':'no-store'});
+        return res.end(req.method==='HEAD'?undefined:"export const storageMode='shared'; export const apiBase='./';");
+      }
+      let decoded;try{decoded=decodeURIComponent(path);}catch{throw new DomainError('这里没有页面哦',404);}
+      if(decoded.split('/').some(part=>part.startsWith('.')))throw new DomainError('这里没有页面哦',404);
+      const file=resolve(root,'.'+(decoded==='/'?'/index.html':decoded)),type=mime[extname(file)];
+      if(!file.startsWith(root+sep)||!type)throw new DomainError('这里没有页面哦',404);
+      let content;try{content=await readFile(file);}catch{throw new DomainError('这里没有页面哦',404);}
       res.writeHead(200,{'content-type':type,'cache-control':'no-cache','content-length':content.length});
       res.end(req.method==='HEAD'?undefined:content);
     } catch(error) {

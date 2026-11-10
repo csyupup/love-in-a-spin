@@ -2,7 +2,7 @@
 
 我们的惊喜小铺：收藏喜欢、奖励和小礼品，勾选后等概率放进转盘，让普通的日子多一点期待。
 
-这是可部署到 GitHub Pages 的纯静态网站，无第三方运行依赖，也不需要线上后端或数据库。
+网页继续由 GitHub Pages 托管；共享模式通过 HTTPS 接口将心愿、勾选状态和抽奖记录保存在服务器的 SQLite 中。项目同时保留无需后端的本机保存模式。
 
 ## 本地运行
 
@@ -37,9 +37,9 @@ node scripts/serve-static.mjs --dir dist --port 4174 --base /love-in-a-spin/
 - 最近 100 条幸福记录与兑现标记；保存抽中时的心愿快照，修改或删除心愿不会改写历史。
 - 可开关音效，支持系统的减少动态效果偏好。弹窗仅内部滚动，关闭后恢复首页位置。
 
-清单、勾选与抽奖记录保存在**当前浏览器的 localStorage**。刷新、关页再打开仍可保留；同一浏览器同一站点的多个标签页会同步。不同设备或浏览器分别保存，无法互相同步。清除网站数据或使用无痕模式，可能丢失本机修改和记录。
+在本机保存模式中，清单、勾选与抽奖记录保存在**当前浏览器的 localStorage**。刷新、关页再打开仍可保留；同一浏览器同一站点的多个标签页会同步。不同设备或浏览器分别保存，无法互相同步。清除网站数据或使用无痕模式，可能丢失本机修改和记录。
 
-预设心愿在 `public/initial-wishes.json`，仅首次访问时载入；更新网站不会覆盖已有的本机清单。本次七份美妆心愿会在已有清单中补齐一次，按名称去重，保留原有编辑、勾选及历史；之后主动删除的美妆心愿不会再次补回。发布文件不包含本地 SQLite 数据库、旧共享链接或运行记录。
+预设心愿在 `public/initial-wishes.json`，仅首次访问时载入；更新网站不会覆盖已有的本机清单。本次七份美妆心愿会在已有清单中补齐一次，按名称去重，保留原有编辑、勾选及历史；之后主动删除的美妆心愿不会再次补回。发布文件不包含 SQLite 数据库、专属清单凭证或运行记录。
 
 ## GitHub Pages 发布
 
@@ -49,13 +49,13 @@ node scripts/serve-static.mjs --dir dist --port 4174 --base /love-in-a-spin/
 
 GitHub 账户套餐必须支持此仓库的 Pages；不支持私有仓库 Pages 的套餐需要将仓库设为公开或升级。公开仓库会公开源码及预设心愿；访问者在自己浏览器中的后续编辑和抽奖记录不会上传到 GitHub。
 
-也可用 Docker 运行静态预览：
+也可用 Docker 运行共享后端（Linux 中先创建 `data/` 并使 UID 1000 可写）：
 
 ```sh
 docker compose up --build -d
 ```
 
-访问 http://localhost:3000 。当前未进行 Docker 环境实测。
+后端只监听 http://127.0.0.1:3000 ，默认关闭 HTTP 创建清单接口；通过 `scripts/create-room.mjs` 在服务器本地创建专属清单。详见 [部署说明](docs/server-deployment.md)。
 
 ## 文件结构
 
@@ -65,7 +65,10 @@ public/browser-store.js    浏览器持久化、等概率抽奖、记录与版�
 scripts/build-pages.mjs    生成 GitHub Pages 静态发布目录
 scripts/serve-static.mjs   本地纯静态预览
 .github/workflows/         自动检查及 Pages 部署
-src/                       保留的旧版本地 Node/SQLite 服务，不参与 Pages 部署
+src/                       共享 Node/SQLite 服务，不参与 Pages 静态发布
+public/shared-store.js     共享接口客户端、能力链接及抽奖重试编号
+public/snapshot.js         备份导入、导出校验
+deploy/                    Compose、Nginx、自动续期和定时备份配置
 tests/                     node:test 单元与集成测试
 docs/                      设计、实现计划和实测记录
 ```
@@ -76,3 +79,17 @@ docs/                      设计、实现计划和实测记录
 - [buuing/lucky-canvas](https://github.com/buuing/lucky-canvas)：参考可配置奖品、图片和文字的抽奖交互。
 
 图标分类交互参考 [Emoji Mart](https://github.com/missive/emoji-mart) 的组织思路，键盘与语义参照 [WAI-ARIA Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)。当前转盘和界面独立实现，未复制以上项目源码。
+
+## 两个人共享
+
+共享版本需要使用同一份含 `#r=…` 的专属链接。凭证只在 URL 片段和请求的 Authorization 头中使用，不写入 GitHub 发布文件；服务器仅保存其哈希。任何持有该链接的人都能修改同一份清单，请只发给另一半。
+
+页面每 3 秒检查更新，在打开弹窗和转盘动画期间暂缓应用远端变化。过期版本的写入会被拒绝并刷新，避免覆盖另一台设备刚完成的修改。服务器负责等概率抽奖和不可变结果快照；每天备份 SQLite，并保留容器重启后的数据。
+
+`npm start` 默认仍在本机保存数据。Pages 工作流通过 `SHARED_API_BASE=https://203.195.205.39/` 生成共享运行配置；接口故障时不会悄悄改为本机保存。若要生成本机保存的静态构建，直接运行 `npm run build`；共享构建使用：
+
+```sh
+SHARED_API_BASE=https://203.195.205.39/ npm run build
+```
+
+旧浏览器数据不会自动上传或清空。共享页面的「导出本机旧清单」可先保存原数据，再使用「导入备份」明确确认替换服务器清单；确认前也会下载当前清单的备份。普通「备份清单」导出当前正在使用的清单。

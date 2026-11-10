@@ -58,3 +58,4 @@
 /* Show the emblem from the official horizontal brand lockups. */
 .prize-brand-icon.brand-kfc{object-fit:cover;object-position:left center}
 .prize-brand-icon.brand-pizzahut{object-fit:cover;object-position:6% center}
+.data-tools{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;margin:24px 0 0;color:var(--muted)}

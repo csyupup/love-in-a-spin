@@ -4,6 +4,9 @@ import { prizeIconHtml, prizeIconLabel, iconGroups, iconCategory, categoryIcons 
 import { createScrollLock } from './scroll-lock.js';
 import { BrowserStore, sortWishes } from './browser-store.js';
 import { MAX_WISHES } from './validation.js';
+import { SharedStore } from './shared-store.js';
+import { storageMode, apiBase } from './runtime-config.js';
+import { validateSnapshot, readSnapshotFile } from './snapshot.js';
 import { WISH_CATALOG_VERSION, WISH_ADDITIONS, WISH_REFINEMENT_VERSION, WISH_REFINEMENTS } from './wish-updates.js';
 
 const $ = selector => document.querySelector(selector);
@@ -14,7 +17,8 @@ const categories={food:'吃喝玩乐',dates:'约会时光',care:'专属宠爱'};
 let state=null,category='food',search='',busy=false,spinning=false,editingId=null,editingRevision=0,deletingId=null;
 let selectedEmoji='🎁',emojiCategory='objects',angle=0,wheelSignature='',sound=false,audioContext,tickTimer,toastTimer,showAllHistory=false,connecting=false,pendingRefresh=false;
 const pageScrollLock=createScrollLock();
-const browserStore=new BrowserStore();
+const browserStore=storageMode==='shared'?new SharedStore({base:new URL(apiBase,import.meta.url)}):new BrowserStore();
+let pendingImport=null,importRevision=0;
 const emptyHistoryMarkup=$('#history-list').innerHTML;
 function showDialog(dialog) {
   pageScrollLock.lock();
@@ -25,9 +29,9 @@ function showDialog(dialog) {
 function toast(message) { const node=$('#toast'); node.textContent=message; node.classList.add('visible'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>node.classList.remove('visible'),3400); }
 function setConnection(online,message='') {
   $('#save-state').classList.toggle('offline',!online);
-  $('#save-state').innerHTML=`<i></i>${online?'已保存在本机':'暂未保存'}`;
+  $('#save-state').innerHTML=`<i></i>${online?(browserStore.shared?'已同步到小铺':'已保存在本机'):'暂未连接'}`;
   $('#connection-banner').hidden=online;
-  $('#connection-message').textContent=message || '本机数据暂未保存，请检查浏览器存储权限后重试。';
+  $('#connection-message').textContent=message || (browserStore.shared?'暂时连不上小铺，请检查网络后重试。':'本机数据暂未保存，请检查浏览器存储权限后重试。');
 }
 function activeItems() {return state?.items.filter(item=>item.selected)||[];}
 function visibleItems() {return sortWishes(state?.items||[]).filter(item=>item.category===category&&(!search||`${item.title} ${item.note}`.toLowerCase().includes(search)));}
@@ -39,6 +43,7 @@ function updateControls() {
   $('#add-button').disabled=locked||state.items.length>=MAX_WISHES;
   $('#select-all').disabled=locked||!visibleItems().length;
   $('#clear-selection').disabled=locked||!activeItems().length;
+  $('#export-data').disabled=locked;$('#import-data').disabled=locked;
   $$('.wish-row input,.wish-actions button,.redeem-button').forEach(node=>{node.disabled=locked;});
   $('#spin-button>span:first-of-type').textContent=spinning?'小幸运正在赶来…':busy?'正在收好心愿…':'转出小惊喜';
 }
@@ -83,7 +88,7 @@ async function refresh(force=false) {
   if(!force&&(busy||spinning||document.hidden||$('dialog[open]'))){pendingRefresh=true;return;}
   pendingRefresh=false;
   try {
-    const next=browserStore.get();if(!next)return;
+    const next=await browserStore.get();if(!next)return;
     setConnection(true);
     if(shouldApplyRemoteState(state?.revision??-1,next.revision,{locked:busy||spinning||Boolean($('dialog[open]')),force})) {state=next;render();}
   }
@@ -95,6 +100,7 @@ async function mutate(action,revision=state.revision) {
   try {state=await browserStore.mutate(revision,action);setConnection(true);render();return true;}
   catch(error) {
     if(error.status===409) await refresh(true);
+    else if(error.status>=500)setConnection(false,error.message);
     throw error;
   } finally {busy=false;updateControls();if(pendingRefresh)refresh();}
 }
@@ -254,16 +260,19 @@ $('#history-more').addEventListener('click',()=>{showAllHistory=!showAllHistory;
 $('#history-list').addEventListener('click',async event=>{const node=event.target.closest('[data-redeem]');if(!node)return;try{if(await mutate({type:'redeem',id:node.dataset.redeem}))toast('幸福记录已更新 ♡');}catch(error){failure(error);}});
 async function connect() {
   if(connecting)return;connecting=true;
+  if(state&&browserStore.shared){connecting=false;return refresh();}
   try {
-    state=browserStore.get();
+    state=await browserStore.get();
     if(!state) {
       const response=await fetch(new URL('./initial-wishes.json',import.meta.url),{cache:'no-cache'});
       if(!response.ok)throw new Error('初始心愿暂未加载完成，请刷新页面重试。');
       const initial=await response.json();state=await browserStore.initialize(initial.items);
     }
-    state=await browserStore.upgradeCatalog(WISH_CATALOG_VERSION,WISH_ADDITIONS);
-    state=await browserStore.refineCatalog(WISH_REFINEMENT_VERSION,WISH_REFINEMENTS,WISH_ADDITIONS.map(item=>item.id));
-    if(new URLSearchParams(location.hash.slice(1)).has('r'))history.replaceState(null,'',location.pathname+location.search);
+    if(!browserStore.shared){
+      state=await browserStore.upgradeCatalog(WISH_CATALOG_VERSION,WISH_ADDITIONS);
+      state=await browserStore.refineCatalog(WISH_REFINEMENT_VERSION,WISH_REFINEMENTS,WISH_ADDITIONS.map(item=>item.id));
+      if(new URLSearchParams(location.hash.slice(1)).has('r'))history.replaceState(null,'',location.pathname+location.search);
+    }
     setConnection(true);render();
   } catch(error) {
     setConnection(false,error.message);
@@ -275,4 +284,34 @@ async function connect() {
 $('#retry-button').addEventListener('click',connect);
 window.addEventListener('storage',event=>{if(event.key===browserStore.key)refresh();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+if(browserStore.shared){
+  $('a[aria-label="Love in a Spin 首页"]').href=location.pathname+location.search+location.hash;
+  $('.collection-tip').innerHTML=`${icon('heart')}同一份专属清单，心愿与记录一起保存。`;
+  setInterval(()=>{if(!connecting)refresh();},3000);
+  window.addEventListener('hashchange',()=>location.reload());
+  try{$('#export-local').hidden=!new BrowserStore().get();}catch{/* Preserve unreadable legacy data. */}
+}
+function downloadSnapshot(snapshot){
+  const checked=validateSnapshot(snapshot);
+  const url=URL.createObjectURL(new Blob([JSON.stringify({version:1,state:checked},null,2)],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download=`惊喜小铺-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$('#export-data').addEventListener('click',()=>{try{downloadSnapshot(state);}catch(error){failure(error);}});
+$('#export-local').addEventListener('click',()=>{try{downloadSnapshot(new BrowserStore().get());}catch(error){failure(error);}});
+$('#import-data').addEventListener('click',()=>$('#import-file').click());
+$('#import-file').addEventListener('change',async event=>{
+  const file=event.target.files[0];event.target.value='';if(!file||busy||spinning||!state)return;
+  try{
+    pendingImport=await readSnapshotFile(file);importRevision=state.revision;
+    $('#import-description').textContent=`将导入 ${pendingImport.items.length} 份心愿和 ${pendingImport.history.length} 条记录，替换当前清单。`;
+    $('#import-error').textContent='';showDialog($('#import-dialog'));
+  }catch(error){failure(error);}
+});
+$('#confirm-import').addEventListener('click',async()=>{
+  if(!pendingImport||busy||spinning)return;
+  $('#confirm-import').disabled=true;
+  try{downloadSnapshot(state);if(await mutate({type:'import',snapshot:pendingImport},importRevision)){$('#import-dialog').close();pendingImport=null;toast('心愿与记录已导入 ♡');}}
+  catch(error){$('#import-error').textContent=error.message;importRevision=state.revision;}
+  finally{$('#confirm-import').disabled=false;}
+});
 connect();
