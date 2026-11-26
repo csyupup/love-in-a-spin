@@ -7,7 +7,7 @@ import { Store } from './store.mjs';
 import { DomainError } from './domain.mjs';
 
 const root = resolve(fileURLToPath(new URL('../public/',import.meta.url)));
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.ico':'image/vnd.microsoft.icon','.webp':'image/webp'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.ico':'image/vnd.microsoft.icon','.webp':'image/webp','.jpg':'image/jpeg','.mp3':'audio/mpeg'};
 async function readJson(req,limit=16384) {
   if (!(req.headers['content-type'] || '').startsWith('application/json')) throw new DomainError('请发送 JSON 内容',415);
   const chunks=[]; let size = 0;
@@ -67,7 +67,8 @@ export function createApplication({dbPath = process.env.DATA_PATH || resolve('da
       }
       let decoded;try{decoded=decodeURIComponent(path);}catch{throw new DomainError('这里没有页面哦',404);}
       if(decoded.split('/').some(part=>part.startsWith('.')))throw new DomainError('这里没有页面哦',404);
-      const file=resolve(root,'.'+(decoded==='/'?'/index.html':decoded)),type=mime[extname(file)];
+      const assetPath = decoded.endsWith('/') ? decoded + 'index.html' : decoded;
+      const file=resolve(root,'.'+assetPath),type=mime[extname(file)];
       if(!file.startsWith(root+sep)||!type)throw new DomainError('这里没有页面哦',404);
       let content;try{content=await readFile(file);}catch{throw new DomainError('这里没有页面哦',404);}
       res.writeHead(200,{'content-type':type,'cache-control':'no-cache','content-length':content.length});

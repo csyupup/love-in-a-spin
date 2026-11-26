@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>告白</title>
+  <meta name="description" content="点开看看,有一份心意在等你">
+  <meta name="theme-color" content="#ff4d6d">
+  <meta property="og:title" content="告白">
+  <meta property="og:description" content="点开看看,有一份心意在等你">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff4d6d' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <canvas id="canvas"></canvas>
+
+  <!-- 盛开后浮现在树上的三颗心意 -->
+  <section id="intentions" aria-label="三颗心意">
+    <button class="intention-heart" type="button" data-intention="understand"
+      aria-expanded="false" aria-controls="intention-note">
+      <span class="intention-content">
+        <img src="heart-intention-soft.png" alt="">
+        <span>我懂你</span>
+      </span>
+    </button>
+    <button class="intention-heart" type="button" data-intention="remember"
+      aria-expanded="false" aria-controls="intention-note">
+      <span class="intention-content">
+        <img src="heart-intention-soft.png" alt="">
+        <span>我记得</span>
+      </span>
+    </button>
+    <button class="intention-heart" type="button" data-intention="promise"
+      aria-expanded="false" aria-controls="intention-note">
+      <span class="intention-content">
+        <img src="heart-intention-soft.png" alt="">
+        <span>我答应</span>
+      </span>
+    </button>
+    <div id="intention-note" aria-live="polite" hidden>
+      <strong id="intention-note-title"></strong>
+      <p id="intention-note-copy"></p>
+    </div>
+  </section>
+
+  <!-- 开场:输入名字 -->
+  <div id="intro">
+    <div class="card">
+      <div class="big-heart">❤</div>
+      <h1>一封给爱妻嘉旋的告白</h1>
+      <p class="sub">有一份惊喜，等你开启</p>
+      <button id="start">开启告白 ✨</button>
+    </div>
+  </div>
+
+  <!-- 情书面板 -->
+  <div id="panel">
+    <div id="lines"></div>
+    <div id="clock-box">
+      <div id="clock-label"></div>
+      <div id="clock"></div>
+    </div>
+  </div>
+
+  <!-- 背景音乐开关 -->
+  <button id="music" title="音乐开关" aria-label="音乐开关">♪</button>
+
+  <audio id="bgm" src="renxi.mp3" loop preload="auto"></audio>
+  <script src="love.js"></script>
+</body>
+</html>

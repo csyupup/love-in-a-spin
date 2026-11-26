@@ -62,6 +62,12 @@ test('production serves full public assets, selects shared storage and forbids p
     assert.equal((await fetch(base+'/api/rooms',{method:'POST',headers:{'content-type':'application/json'},body:'{}'})).status,403);
     assert.match(await(await fetch(base+'/runtime-config.js')).text(),/shared/);
     for(const path of ['/browser-store.js','/validation.js','/shared-store.js','/snapshot.js','/wish-updates.js','/icons/kfc.png','/icons/guming.png','/icons/starbucks.svg','/initial-wishes.json'])assert.equal((await fetch(base+path)).status,200,path);
+    const treePage = await fetch(base + '/love-tree/');
+    assert.equal(treePage.status, 200);
+    assert.match(await treePage.text(), /id="bgm" src="renxi\.mp3"/);
+    const treeMusic = await fetch(base + '/love-tree/renxi.mp3', { method: 'HEAD' });
+    assert.equal(treeMusic.status, 200);
+    assert.equal(treeMusic.headers.get('content-type'), 'audio/mpeg');
     for(const path of ['/.env','/src/store.mjs','/data/love.db','/../package.json'])assert.equal((await fetch(base+path)).status,404,path);
     assert.equal((await fetch(base+'/api/state')).status,401);
   }finally{await new Promise(r=>server.close(r));store.close();}
